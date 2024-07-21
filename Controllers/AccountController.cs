@@ -48,7 +48,7 @@ namespace ShopWeb.Controllers
                     ModelState.AddModelError("Email", "Email đã tồn tại!");
                     return View(registerViewModel);
                 }
-
+                hjbgdhjfbvhjdfbvhdfbvhjabdhjlbvhjdfabvhjlbdfjlbv
                 // Check if the password meets the configured requirements
                 var passwordValidator = new PasswordValidator<ApplicationUser>();
                 var result = await passwordValidator.ValidateAsync(userManager, null, registerViewModel.Password);
