@@ -1,0 +1,48 @@
+﻿@model List<ShopWeb.Models.Domain.Purchase>
+
+@{
+    ViewBag.RenderDefaultNavbar = false;
+}
+
+@await Html.PartialAsync("SideNavBar")
+
+
+@if (Model != null && Model.Any())
+{
+    <div id="tracking-container" style="margin-left: 200px;">
+        <h1>Purchase Tracking</h1>
+        <table class="table">
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Date</th>
+                    <th>State</th>
+                    <!-- Add more columns as needed -->
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var purchase in Model)
+                {
+                    <tr>
+                        <td>@purchase.Id</td>
+                        <td>@purchase.PurchaseDate</td>
+                        @if (purchase.State == "None")
+                        {
+                            <td>Đơn hàng đang được kiểm duyệt để gửi đi</td>
+                        } else
+                        {
+                            <td>@purchase.State</td>
+                        }
+                        <!-- Add more cells as needed -->
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+}
+else
+{
+    <div id="tracking-container" style="margin-left: 200px;">
+        <p>No purchases available for tracking.</p>
+    </div>
+}

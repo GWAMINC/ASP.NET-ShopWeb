@@ -1,0 +1,85 @@
+﻿@using Microsoft.AspNetCore.Identity;
+@using ShopWeb.Models.Domain;
+
+@inject SignInManager<ApplicationUser> signInManager;
+@inject UserManager<ApplicationUser> userManager;
+@model List<ShopWeb.Models.Domain.Product>
+
+<div class="row">
+    @if (Model != null && Model.Any())
+    {
+        @foreach (var product in Model)
+        {
+            <div class="col-md-4">
+                <div class="card mb-4 product-wap rounded-0">
+                    <div class="card rounded-0">
+                        <img class="card-img rounded-0 img-fluid" src="@product.FeaturedImageUrl">
+                        <div class="card-img-overlay rounded-0 product-overlay d-flex align-items-center justify-content-center">
+                            <ul class="list-unstyled">
+                                @if (signInManager.IsSignedIn(User))
+                                {
+                                    <li>
+                                        <a id="btnLike-@product.Id" class="btn btn-success text-white" data-product-id="@product.Id" style="cursor: pointer">
+                                            <i class="bi bi-heart"></i>
+                                        </a>
+                                    </li>
+                                }
+                                <li>
+                                    <a class="btn btn-success text-white mt-2" asp-area=""
+                                       asp-controller="Products"
+                                       asp-action="Index"
+                                       asp-route-id="@product.Id">
+                                        <i class="bi bi-eye"></i>
+                                    </a>
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+                    <div class="card-body">
+                        <a asp-area=""
+                           asp-controller="Products"
+                           asp-action="Index"
+                           asp-route-id="@product.Id" class="h3 text-decoration-none productNameLink">@product.Name</a>
+
+                        <ul class="list-unstyled d-flex justify-content-center mb-1">
+                            <li>
+                                <div class="rating">
+                                    @for (int i = 1; i <= 5; i++)
+                                    {
+                                        if (i <= product.Rating)
+                                        {
+                                            <span class="star text-warning" data-value="@i">&#9733;</span>
+                                        }
+                                        else
+                                        {
+                                            <span class="star text-muted" data-value="@i">&#9734;</span>
+                                        }
+                                    }
+                                </div>
+                            </li>
+                        </ul>
+                        @if (product.IsSale && product.SaleEndDate > DateTime.Now)
+                        {
+                            <p class="text-center mb-0">Giá: <span class="vnd-symbol">đ</span>@product.SalePrice.Value.ToString("N0") <del><span class="vnd-symbol">đ</span>@product.Price.ToString("N0")</del></p>
+                        }
+                        else
+                        {
+                            <p class="text-center mb-0">Giá: <span class="vnd-symbol">đ</span>@product.Price.ToString("N0")</p>
+                        }
+                        
+                    </div>
+                </div>
+            </div>
+        }
+    } else
+    {
+        <p>Không có sản phẩm!</p>
+    }
+</div>
+
+@section Scripts {
+    <script>
+
+        
+    </script>
+}

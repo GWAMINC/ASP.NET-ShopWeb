@@ -1,0 +1,366 @@
+﻿@model ShopWeb.Models.ViewModels.HomeViewModel;
+
+@{
+    ViewData["Title"] = "Home Page";
+    
+}
+
+<div id="home-page-container">
+    <div id="index-container">
+        <div class="row justify-content-center" id="template-mo-zay-hero-carousel">
+            <div class="row text-center py-3">
+                <div class="col-lg-6 m-auto">
+                    <h1 style="color: #28a745" class="h1">Sản phẩm bán chạy</h1>
+                    <p>
+                        Reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur.
+                        Excepteur sint occaecat cupidatat non proident.
+                    </p>
+                </div>
+            </div>
+            <div id="best-selling-and-sort-container">
+                <div id="sort-container">
+                    <div class="container" id="category-container">
+                        <div class="justify-content-center">
+                            <div class="text-center">
+                                <div id="category-list" class="category-list">
+                                    @if (Model != null && Model.Categories.Any())
+                                    {
+                                        foreach (var cate in Model.Categories)
+                                        {
+                                            <div style="text-align: left;">
+                                                <a href="@Url.Action("Shop", "Home", new { category = cate.Name })" class="btn btn-sort-item category-tag">
+                                                    <span>@cate.Name</span> 
+                                                    <i class="bi bi-caret-right-fill"></i>
+                                                </a>
+                                            </div>
+
+                                        }
+                                    }
+                                    else
+                                    {
+                                        <p>Không tìm thấy danh mục!</p>
+                                    }
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+
+
+                <div id="best-selling-container">
+                    @if (Model.bestSellingProducts != null && Model.bestSellingProducts.Any())
+                    {
+                        <div class="row">
+                            <div class="col-md-8">
+                                <div id="carouselExampleControls" class="carousel slide" data-bs-ride="carousel">
+                                    <div class="carousel-inner">
+                                        @foreach (var product in Model.bestSellingProducts)
+                                        {
+                                            <div class="carousel-item @(product == Model.bestSellingProducts.First() ? "active" : "")">
+                                                <a asp-area="" asp-action="Index" asp-controller="Products" asp-route-id="{@product.Id}">
+                                                    <img src="@product.FeaturedImageUrl" class="d-block w-100" alt="@product.Name">
+                                                    <div class="purchase-count-ribbon">
+                                                        Số lượt bán: @product.PurchaseCount
+                                                    </div>
+                                                </a>
+                                                <!-- <div class="carousel-caption d-none d-md-block">
+                                                    <h5>@product.Name</h5>
+                                                    <p>Price: <span class="vnd-symbol">đ</span>@product.Price.ToString("N0")</p>
+                                                    <p>Purchase Count: @product.PurchaseCount</p>
+                                                </div> -->
+                                            </div>
+                                        }
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <ul id="best-selling-list" class="list-group">
+                                    @foreach (var product in Model.bestSellingProducts)
+                                    {
+                                        <li class="list-group-item d-flex justify-content-between align-items-center best-selling-item" data-product-id="@product.Id">
+                                            <img src="@product.FeaturedImageUrl" class="img-thumbnail" style="width: 90px;" alt="@product.Name">
+                                            <div class="text-right">
+                                                <h5 style="    padding-top: 15px !important;">@product.Name</h5>
+                                                @if (product.IsSale && product.SaleEndDate > DateTime.Now)
+                                                {
+                                                    <p>Giá: <span class="vnd-symbol">đ</span>@product.SalePrice.Value.ToString("N0") <del><span class="vnd-symbol">đ</span>@product.Price.ToString("N0")</del></p>
+                                                }
+                                                else
+                                                {
+                                                    <p>Giá: <span class="vnd-symbol">đ</span>@product.Price.ToString("N0")</p>
+                                                }
+                                            </div>
+                                        </li>
+                                    }
+                                </ul>
+                            </div>
+                        </div>
+
+                    }
+                    else
+                    {
+                        <p>No best-selling products found.</p>
+                    }
+                </div>
+            </div>
+        </div>
+        <div id="search-allProducts-container">
+            
+            <div id="product-list-container">
+                @if (Model.ProductsByCategory.ContainsKey("Quần áo Nam") && Model.ProductsByCategory["Quần áo Nam"].Any())
+                {
+                    <section class="bg-light">
+                        <div class="container py-5">
+                            <div class="row text-center py-3">
+                                <div class="col-lg-6 m-auto">
+                                    <h1 style="color: #28a745" class="h1">Quần áo</h1>
+                                    <p>
+                                        Reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur.
+                                        Excepteur sint occaecat cupidatat non proident.
+                                    </p>
+                                </div>
+                            </div>
+                            <div class="row">
+                                @foreach (var product in Model.ProductsByCategory["Quần áo Nam"])
+                                {
+                                    <div class="col-12 col-md-4 mb-4">
+                                        <div class="card h-100">
+                                            @if (product.State == "Available")
+                                            {
+                                                <a class="image-link"
+                                                   asp-area=""
+                                                   asp-controller="Products"
+                                                   asp-action="Index"
+                                                   asp-route-id="{@product.Id}"><img src="@product.FeaturedImageUrl" alt="@product.Name" class="mb-2 d-block img-fluid" /></a>
+
+                                                
+                                            } else
+                                            {
+                                                <div class="image-container">
+                                                    <img src="@product.FeaturedImageUrl" alt="@product.Name" class="mb-2 d-block img-fluid first-layer" />
+                                                    <img src="/Assets/ood.jpg" class="second-layer" />
+                                                </div>
+                                            }
+                                            <div class="card-body">
+                                                <ul class="list-unstyled d-flex justify-content-between">
+                                                    <li>
+                                                        <div class="rating">
+                                                            @for (int i = 1; i <= 5; i++)
+                                                            {
+                                                                if (i <= product.Rating)
+                                                                {
+                                                                    <span class="star text-warning" data-value="@i">&#9733;</span>
+                                                                }
+                                                                else
+                                                                {
+                                                                    <span class="star text-muted" data-value="@i">&#9734;</span>
+                                                                }
+                                                            }
+                                                        </div>
+                                                    </li>
+                                                    @if (product.IsSale && product.SaleEndDate > DateTime.Now)
+                                                    {
+                                                        <li class="text-muted text-right">Giá: <span class="vnd-symbol">đ</span>@product.SalePrice.Value.ToString("N0") <del><span class="vnd-symbol">đ</span>@product.Price.ToString("N0")</del></li>
+                                                    }
+                                                    else
+                                                    {
+                                                        <li class="text-muted text-right">Giá: <span class="vnd-symbol">đ</span>@product.Price.ToString("N0")</li>
+                                                    }
+                                                </ul>
+                                                <h2 class="h2 text-decoration-none text-dark">@product.Name</h2>
+                                                <!-- <p class="card-text">
+                                                    Lorem ipsum dolor sit amet, consectetur adipisicing elit. Sunt in culpa qui officia deserunt.
+                                                </p> -->
+                                                <p class="text-muted">(@product.CommentsCount đánh giá)</p>
+                                                @if (product.State == "Available")
+                                                {
+                                                    <div>
+                                                        <a class="btn btn-dark"
+                                                           asp-area=""
+                                                           asp-controller="Products"
+                                                           asp-action="Index"
+                                                           asp-route-id="{@product.Id}">Chi Tiết</a>
+                                                    </div>
+                                                }
+                                            </div>
+                                        </div>
+                                    </div>
+                                }
+                            </div>     
+                        </div>
+                    </section>
+                } else
+                {
+                    <p>No Products Found!</p>
+                }
+
+            </div>
+            <div id="product-list-container">
+                @if (Model.ProductsByCategory.ContainsKey("Bàn phím") && Model.ProductsByCategory["Bàn phím"].Any())
+                {
+                    <section class="bg-light">
+                        <div class="container py-5">
+                            <div class="row text-center py-3">
+                                <div class="col-lg-6 m-auto">
+                                    <h1 style="color: #28a745" class="h1">Đồ điện tử</h1>
+                                    <p>
+                                        Reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur.
+                                        Excepteur sint occaecat cupidatat non proident.
+                                    </p>
+                                </div>
+                            </div>
+                            <div class="row">
+                                @foreach (var product in Model.ProductsByCategory["Bàn phím"])
+                                {
+                                    <div class="col-12 col-md-4 mb-4">
+                                        <div class="card h-100">
+                                            @if (product.State == "Available")
+                                            {
+                                                <a class="image-link"
+                                                   asp-area=""
+                                                   asp-controller="Products"
+                                                   asp-action="Index"
+                                                   asp-route-id="{@product.Id}"><img src="@product.FeaturedImageUrl" alt="@product.Name" class="mb-2 d-block img-fluid" /></a>
+
+
+                                            }
+                                            else
+                                            {
+                                                <div class="image-container">
+                                                    <img src="@product.FeaturedImageUrl" alt="@product.Name" class="mb-2 d-block img-fluid first-layer" />
+                                                    <img src="/Assets/ood.jpg" class="second-layer" />
+                                                </div>
+                                            }
+                                            <div class="card-body">
+                                                <ul class="list-unstyled d-flex justify-content-between">
+                                                    <li>
+                                                        <div class="rating">
+                                                            @for (int i = 1; i <= 5; i++)
+                                                            {
+                                                                if (i <= product.Rating)
+                                                                {
+                                                                    <span class="star text-warning" data-value="@i">&#9733;</span>
+                                                                }
+                                                                else
+                                                                {
+                                                                    <span class="star text-muted" data-value="@i">&#9734;</span>
+                                                                }
+                                                            }
+                                                        </div>
+                                                    </li>
+                                                    @if (product.IsSale && product.SaleEndDate > DateTime.Now)
+                                                    {
+                                                        <li class="text-muted text-right">Giá: <span class="vnd-symbol">đ</span>@product.SalePrice.Value.ToString("N0") <del><span class="vnd-symbol">đ</span>@product.Price.ToString("N0")</del></li>
+                                                    }
+                                                    else
+                                                    {
+                                                        <li class="text-muted text-right">Giá: <span class="vnd-symbol">đ</span>@product.Price.ToString("N0")</li>
+                                                    }
+                                                </ul>
+                                                <h2 class="h2 text-decoration-none text-dark">@product.Name</h2>
+                                                <!-- <p class="card-text">
+                                                    Lorem ipsum dolor sit amet, consectetur adipisicing elit. Sunt in culpa qui officia deserunt.
+                                                </p> -->
+                                                <p class="text-muted">(@product.CommentsCount đánh giá)</p>
+                                                @if (product.State == "Available")
+                                                {
+                                                    <div>
+                                                        <a class="btn btn-dark"
+                                                           asp-area=""
+                                                           asp-controller="Products"
+                                                           asp-action="Index"
+                                                           asp-route-id="{@product.Id}">Chi Tiết</a>
+                                                    </div>
+                                                }
+                                            </div>
+                                        </div>
+                                    </div>
+                                }
+                            </div>
+                        </div>
+                    </section>
+                }
+                else
+                {
+                    <p>No Products Found!</p>
+                }
+
+            </div>
+        </div>
+    </div>
+
+
+    
+</div>
+
+@section Scripts {
+    <script>
+
+        $(document).ready(function () {
+            $('.category-tag').click(function () {
+                var categoryName = $(this).text().trim();
+                sortByCategory(categoryName);
+                $('#category').val(categoryName);
+            });
+        });
+
+        $(document).ready(function () {
+            $('.carousel').carousel({
+                interval: 5000 // Change slide every 5 seconds
+            });
+        });
+
+        function sortByCategory(categoryName) {
+            $.ajax({
+                url: '/Home/SortByCategory',
+                type: 'GET',
+                data: { category: categoryName },
+                success: function (data) {
+                    $('#product-list-container').empty();
+                    $('#product-list-container').html(data);
+                },
+                error: function () {
+                    alert('Error occurred while sorting products.');
+                }
+            });
+        }
+        document.addEventListener('DOMContentLoaded', function () {
+            const bestSellingList = document.getElementById('best-selling-list');
+            const bestSellingItems = bestSellingList.querySelectorAll('.best-selling-item');
+            const carousel = new bootstrap.Carousel(document.getElementById('carouselExampleControls'), {
+                interval: 5000
+            });
+            let currentIndex = 0;
+
+            function highlightProduct(index) {
+                bestSellingItems.forEach(item => item.classList.remove('active'));
+                bestSellingItems[index].classList.add('active');
+
+                // Move the carousel to the correct slide
+                carousel.to(index);
+            }
+
+            function autoHighlight() {
+                highlightProduct(currentIndex);
+                currentIndex = (currentIndex + 1) % bestSellingItems.length;
+            }
+
+            setInterval(autoHighlight, 5000);
+
+            bestSellingItems.forEach((item, index) => {
+                item.addEventListener('click', () => {
+                    currentIndex = index;
+                    highlightProduct(currentIndex);
+                });
+            });
+
+            // Initialize the first product
+            highlightProduct(currentIndex);
+        });
+
+
+        
+    </script>
+
+}

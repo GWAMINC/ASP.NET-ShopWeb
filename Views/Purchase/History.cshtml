@@ -1,0 +1,44 @@
+﻿@model List<ShopWeb.Models.Domain.Purchase>
+
+@{
+    ViewBag.RenderDefaultNavbar = false;
+}
+
+@await Html.PartialAsync("SideNavBar")
+
+
+@if (Model != null && Model.Any())
+{
+    <div id="history-container" style="margin-left: 200px;">
+        <h1>Purchase History</h1>
+        <table class="table">
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Date</th>
+                    <th>State</th>
+                    <th>Total Price</th>
+                    <!-- Add more columns as needed -->
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var purchase in Model)
+                {
+                    <tr>
+                        <td>@purchase.Id</td>
+                        <td>@purchase.PurchaseDate</td>
+                        <td>@purchase.State</td>
+                        <td>@purchase.TotalPrice</td>
+                        <!-- Add more cells as needed -->
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+}
+else
+{
+    <div id="history-container" style="margin-left: 200px;">
+        <p>No purchase history available.</p>
+    </div>
+}

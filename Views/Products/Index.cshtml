@@ -1,0 +1,583 @@
+﻿@using Microsoft.AspNetCore.Identity;
+@using ShopWeb.Models.Domain;
+
+@inject SignInManager<ApplicationUser> signInManager;
+@inject UserManager<ApplicationUser> userManager;
+
+@model ShopWeb.Models.ViewModels.ProductVM.ProductDetailViewModel
+@{
+    ViewData["Title"] = "Product Details";
+    ViewData["Check"] = true;
+}
+
+<!-- Open Content -->
+@if (Model != null)
+{
+    <section class="bg-light">
+        <div class="container pb-5">
+            <div class="row">
+                <div class="col-lg-5 mt-5">
+                    @if (Model.AdditionalImageUrls.FirstOrDefault() == null)
+                    {
+                        <div class="card mb-3">
+                            <img class="card-img img-fluid" src="@Model.FeaturedImageUrl" alt="Card image cap" id="highlighted-image">
+                        </div>
+                    } else
+                    {
+                        <div class="card mb-3">
+                            <img class="card-img img-fluid" src="@Model.AdditionalImageUrls.FirstOrDefault()" alt="Card image cap" id="highlighted-image">
+                        </div>
+                    }
+                    <div class="row">
+                        <!-- Start Controls -->
+                        <div class="col-1 align-self-center">
+                            <a href="#" id="carousel-prev" role="button">
+                                <i class="bi bi-caret-left-fill"></i>
+                            </a>
+                        </div>
+                        <!-- End Controls -->
+                        <!-- Start Carousel Wrapper -->
+                        <div id="multi-item-example" class="col-10 carousel slide carousel-multi-item" data-bs-ride="carousel">
+                            <!-- Start Slides -->
+                            <div class="carousel-inner product-links-wap" role="listbox">
+                                @if (Model.AdditionalImageUrls != null && Model.AdditionalImageUrls.Any())
+                                {
+                                    @for (int i = 0; i < Model.AdditionalImageUrls.Count(); i += 3)
+                                    {
+                                        <div class="carousel-item @(i == 0 ? "active" : "")">
+                                            <div class="row">
+                                                @foreach (var imageUrl in Model.AdditionalImageUrls.Skip(i).Take(3))
+                                                {
+                                                    <div class="col-4">
+                                                        <img class="card-img img-fluid additional-image" src="@imageUrl" alt="Additional Product Image">
+                                                    </div>
+                                                }
+                                            </div>
+                                        </div>
+                                    }
+                                }
+                            </div>
+                            <!-- End Slides -->
+                        </div>
+                        <!-- End Carousel Wrapper -->
+                        <!-- Start Controls -->
+                        <div class="col-1 align-self-center">
+                            <a href="#" id="carousel-next" role="button">
+                                <i class="bi bi-caret-right-fill"></i>
+                            </a>
+                        </div>
+                        <!-- End Controls -->
+                    </div>
+                </div>
+                <!-- col end -->
+                <div class="col-lg-7 mt-5">
+                    <div class="card">
+                        <div class="card-body">
+                            <h1 class="h2">@Model.Name</h1>
+                            @if (Model.IsSale && Model.SaleEndDate > DateTime.Now)
+                            {
+                                <p class="h3 py-2">Giá: <span class="vnd-symbol">đ</span>@Model.SalePrice.Value.ToString("N0") <del><span class="vnd-symbol">đ</span>@Model.Price.ToString("N0")</del></p>
+                            }
+                            else
+                            {
+                                <p class="h3 py-2">Giá: <span class="vnd-symbol">đ</span>@Model.Price.ToString("N0")</p>
+                            }
+                            
+                            @if (signInManager.IsSignedIn(User))
+                            {
+
+                                    <button id="btnLike" class="like-button" style="cursor: pointer"></button>
+
+                            }
+
+                            <span id="totalLikes" class="mb-3">@ViewData["TotalLikes"]</span><span> Lượt yêu thích</span>
+                            <p class="py-2">
+                                <div class="rating">
+                                    <span class="star" data-value="1">&#9733;</span>
+                                    <span class="star" data-value="2">&#9733;</span>
+                                    <span class="star" data-value="3">&#9733;</span>
+                                    <span class="star" data-value="4">&#9733;</span>
+                                    <span class="star" data-value="5">&#9733;</span>
+                                </div>
+                                <span class="list-inline-item text-dark">Rating @ViewData["AverageRating"] | @Model.CommentsCount bình luận</span>
+                            </p>
+                            
+
+                            <h6>Mô tả:</h6>
+                            <p>@Html.Raw(Model.Description)</p>
+
+
+
+
+
+
+                            @using (Html.BeginForm("AddToCart", "Cart", FormMethod.Post, new { id = "add-to-cart-form" }))
+                            {
+                                <div class="container py-5">
+                                    @if (Model.Variants != null && Model.Variants.Any())
+                                    {
+                                        <div class="variants-container">
+                                            @foreach (var variantList in Model.Variants)
+                                            {
+                                                @foreach (var key in variantList.Keys)
+                                                {
+                                                    <div class="variant-category" data-category="@key">
+                                                        <h5>@key</h5>
+                                                        <div class="variant-values">
+                                                            @foreach (var value in variantList[key])
+                                                            {
+                                                                <button class="variant-button" data-category="@key">@value</button>
+                                                            }
+                                                        </div>
+                                                    </div>
+                                                }
+                                            }
+                                        </div>
+                                    }
+                                    <input type="hidden" name="productId" value="@Model.Id" />
+                                    <input type="hidden" id="selectedVariants" name="selectedVariants" value="" />
+                                    <div class="col-auto">
+                                        <ul class="list-inline pb-3">
+                                            <li class="list-inline-item text-right">
+                                                Số lượng
+                                                <input type="hidden" name="product-quantity" id="product-quantity" value="1">
+                                            </li>
+                                            <li class="list-inline-item"><span class="btn btn-success" id="btn-minus">-</span></li>
+                                            <li class="list-inline-item">
+                                                <input type="number" name="quantity" id="quantity-input" class="form-control mb-3"
+                                                       value="1" min="1" max="@Model.Quantity" oninput="validateInput(this)" style="width: 60px; text-align: center;">
+                                            </li>
+                                            <li class="list-inline-item"><span class="btn btn-success" id="btn-plus">+</span></li>
+                                        </ul>
+                                    </div>
+                                    <input type="hidden" id="additionalParameter" name="additionalParameter" value="" />
+                                    <div class="row pb-3">
+                                        <div class="col d-grid">
+                                            <button type="submit" class="btn btn-success btn-lg" name="submit" value="buy" onclick="setAdditionalParameter('valueForBuy')">Mua Ngay</button>
+                                        </div>
+                                        <div class="col d-grid">
+                                            <button type="submit" class="btn btn-success btn-lg" name="submit" value="addtocard">Thêm vào giỏ hàng</button>
+                                        </div>
+                                    </div>
+                                </div>
+                            }
+
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+}
+<!-- Close Content -->
+<!-- Start Article -->
+
+<!-- End Article -->
+<div class="container py-5" id="rating-container">
+    @using (Html.BeginForm("RateProduct", "Products", FormMethod.Post))
+    {
+
+        @Html.HiddenFor(m => m.Id)
+        <h5>Bạn đánh giá sản phẩm này chất lượng như nào?</h5>
+        <div class="form-group">
+            <select class="form-control" asp-for="Rating">
+                <option value="1">1 Star</option>
+                <option value="2">2 Stars</option>
+                <option value="3">3 Stars</option>
+                <option value="4">4 Stars</option>
+                <option value="5">5 Stars</option>
+            </select>
+        </div>
+        <button type="submit" class="btn btn-dark">Đánh giá</button>
+    }
+</div>
+
+<div class="card" id="comment-container">
+    <div class="card-header">
+        <h5>Bình luận</h5>
+        @if (signInManager.IsSignedIn(User))
+        {
+            @using (Html.BeginForm("Index", "Products", FormMethod.Post))
+            {
+                @Html.TextBoxFor(m => m.CommentDescription, new { @class = "form-control mb-3" })
+
+                <button type="submit" class="btn btn-dark">Gửi</button>
+                <input type="hidden" asp-for="Id" />
+            }
+        }
+
+    </div>
+    <div class="card-body">
+        @if (Model.Comments != null)
+        {
+            @foreach (var comment in Model.Comments)
+            {
+                <div class="card mb-3">
+                    <div class="card-body">
+                        <div>
+                            @comment.Description
+                        </div>
+                        <div class="d-flex justify-content-between">
+                            <span class="text-secondary">@comment.Username</span>
+                            <span class="text-secondary">@comment.TimeAdd.ToShortDateString()</span>
+                        </div>
+                    </div>
+                </div>
+            }
+        }
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        const btnLikeElement = document.getElementById("btnLike");
+        const totalLikesElement = document.getElementById("totalLikes");
+        const productId = "@Model.Id";
+
+        function handleVariantButtons() {
+            const variantCategories = document.querySelectorAll('.variant-category');
+            variantCategories.forEach(function (category) {
+                const variantButtons = category.querySelectorAll('.variant-button');
+                variantButtons.forEach(function (button) {
+                    button.addEventListener('click', function (event) {
+                        event.preventDefault(); // Ngăn chặn hành vi mặc định của nút button
+                        highlightButton(button, category);
+                        updateHiddenInput();
+                    });
+                });
+            });
+        }
+
+        function highlightButton(button, category) {
+            // Lấy giá trị của thuộc tính data-category
+            const categoryAttribute = button.getAttribute('data-category');
+
+            // Kiểm tra xem categoryAttribute có hợp lệ không
+            if (!categoryAttribute) {
+                console.error('data-category attribute is missing on the button.');
+                return;
+            }
+
+            // Loại bỏ highlight từ tất cả các nút trong cùng một variant-category
+            const variantButtons = document.querySelectorAll(`.variant-button[data-category="${categoryAttribute}"]`);
+            variantButtons.forEach(function (btn) {
+                btn.classList.remove('highlight');
+            });
+
+            // Thêm highlight vào nút được click
+            button.classList.add('highlight');
+        }
+
+        function updateHiddenInput() {
+            const highlightedButtons = document.querySelectorAll('.variant-button.highlight');
+            const selectedValues = Array.from(highlightedButtons).map(button => button.textContent.trim()).join(' ');
+            const hiddenInput = document.getElementById('selectedVariants');
+            hiddenInput.value = selectedValues;
+        }
+        handleVariantButtons();
+
+
+        function setAdditionalParameter(value) {
+            document.getElementById('additionalParameter').value = value;
+        }
+
+        document.addEventListener('DOMContentLoaded', function () {
+            const addToCartButton = document.querySelector('button[name="submit"][value="addtocard"]');
+            const cartAnimationModal = new bootstrap.Modal(document.getElementById('cartAnimationModal'), {
+                keyboard: false,
+                backdrop: 'static'
+            });
+
+            addToCartButton.addEventListener('click', function (event) {
+                event.preventDefault();
+
+                // Show animation
+                cartAnimationModal.show();
+
+                // Collect form data
+                var form = document.getElementById('add-to-cart-form');
+                var formData = new FormData(form);
+
+                // Perform AJAX request
+                $.ajax({
+                    type: "POST",
+                    url: form.action,
+                    data: formData,
+                    processData: false,
+                    contentType: false,
+                    success: function (response) {
+                        if (response.success) {
+                            // Hide animation after 1 second
+                            setTimeout(function () {
+                                cartAnimationModal.hide();
+                                updateCartItemCount();
+                            }, 1000);
+                            console.log(response);
+                            console.log("Success");
+                        } else {
+                            console.error("Error adding to cart:", response.message);
+                            // Optionally handle the error, e.g., display an error message to the user
+                            alert(response.message);
+                            cartAnimationModal.hide();
+                        }
+                    },
+                    error: function (error) {
+                        // Handle error
+                        console.error("There was an error with the AJAX request:", error);
+                    }
+                });
+            });
+            function updateCartItemCount() {
+                $.ajax({
+                    type: "GET",
+                    url: "/Cart/GetCartItemCount",
+                    success: function (response) {
+                        document.getElementById('cartItemCount').innerText = response.itemCount;
+                        console.log(response);
+                    },
+                    error: function (error) {
+                        console.error("There was an error updating the cart item count:", error);
+                    }
+                });
+            }
+        });
+
+        document.addEventListener('DOMContentLoaded', (event) => {
+            let currentIndex = 0;
+            const images = document.querySelectorAll('.additional-image');
+            const highlightedImageElement = document.getElementById('highlighted-image');
+            let intervalId;
+
+            if (images.length > 0) {
+                // Function to update the highlighted image
+                function updateHighlightedImage() {
+                    images.forEach((img, index) => {
+                        img.style.border = '';
+                    });
+
+                    const currentImage = images[currentIndex];
+                    currentImage.style.border = '3px solid green';
+                    highlightedImageElement.src = currentImage.src;
+
+                    currentIndex = (currentIndex + 1) % images.length;
+                }
+
+                // Function to handle manual image click
+                function handleImageClick(event) {
+                    clearInterval(intervalId);
+                    images.forEach((img, index) => {
+                        img.style.border = '';
+                    });
+
+                    const clickedImage = event.target;
+                    clickedImage.style.border = '3px solid green';
+                    highlightedImageElement.src = clickedImage.src;
+
+                    // Restart the interval after 5 seconds
+                    intervalId = setInterval(updateHighlightedImage, 10000);
+                }
+
+                // Add click event listener to all additional images
+                images.forEach((img, index) => {
+                    img.addEventListener('click', handleImageClick);
+                });
+
+                // Initial highlight
+                updateHighlightedImage();
+
+                // Update image every 5 seconds
+                intervalId = setInterval(updateHighlightedImage, 10000);
+            }
+        });
+
+        document.addEventListener('DOMContentLoaded', function () {
+            var highlightedImage = document.getElementById('highlighted-image');
+            var modalImage = document.getElementById('modalImage');
+
+            highlightedImage.addEventListener('click', function () {
+                var imgSrc = highlightedImage.getAttribute('src');
+                modalImage.setAttribute('src', imgSrc);
+                var myModal = new bootstrap.Modal(document.getElementById('imageModal'), {
+                    keyboard: true
+                });
+                myModal.show();
+            });
+        });
+
+        $(document).ready(function () {
+            $('#carousel-prev').click(function (e) {
+                e.preventDefault();
+                $('#multi-item-example').carousel('prev');
+            });
+            $('#carousel-next').click(function (e) {
+                e.preventDefault();
+                $('#multi-item-example').carousel('next');
+            });
+        });
+
+        $(document).ready(function () {
+
+            var ratingValue = @Html.Raw(Json.Serialize(ViewData["AverageRating"]));
+            var roundedRating = Math.round(ratingValue * 2) / 2;
+
+
+            $('.star').each(function () {
+                var starValue = parseFloat($(this).attr('data-value'));
+                if (starValue <= roundedRating) {
+                    $(this).addClass('active');
+                }
+            });
+        });
+
+        
+
+
+        async function getTotalLikes() {
+            fetch(`/api/productlike/${productId}/totalLikes`, {
+                method: 'GET',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Accept': '*/*'
+                },
+            }).then(data => data.json()).then(result => {
+                totalLikesElement.innerHTML = result;
+            });
+        }
+
+        async function checkLikeStatus() {
+            const hasLiked = localStorage.getItem(`liked_${productId}`);
+            if (hasLiked === 'true') {
+                btnLikeElement.innerHTML = '<i class="bi bi-heart-fill"></i>';
+                btnLikeElement.removeEventListener('click', addLiketoProduct);
+                btnLikeElement.addEventListener('click', removeLikeFromProduct);
+            } else {
+                btnLikeElement.innerHTML = 'Tick as Favourite <i class="bi bi-heart"></i>';
+                btnLikeElement.removeEventListener('click', removeLikeFromProduct);
+                btnLikeElement.addEventListener('click', addLiketoProduct);
+            }
+        }
+
+        async function addLiketoProduct() {
+            fetch('/api/ProductLike/Add', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Accept': '*/*'
+                },
+                body: JSON.stringify({
+                    productId: productId,
+                    userId: '@userManager.GetUserId(User)'
+                })
+            }).then(() => {
+                localStorage.setItem(`liked_${productId}`, 'true');
+                btnLikeElement.classList.add('active');
+                btnLikeElement.innerHTML = '<i class="bi bi-heart-fill"></i>';
+                btnLikeElement.removeEventListener('click', addLiketoProduct);
+                btnLikeElement.addEventListener('click', removeLikeFromProduct);
+                getTotalLikes();
+            });
+        }
+
+        async function removeLikeFromProduct() {
+            fetch('/api/ProductLike/Remove', {
+                method: 'DELETE',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Accept': '*/*'
+                },
+                body: JSON.stringify({
+                    productId: productId,
+                    userId: '@userManager.GetUserId(User)'
+                })
+            }).then(() => {
+                localStorage.removeItem(`liked_${productId}`);
+                btnLikeElement.classList.remove('active');
+                btnLikeElement.innerHTML = 'Tick as Favourite <i class="bi bi-heart"></i>';
+                btnLikeElement.removeEventListener('click', removeLikeFromProduct);
+                btnLikeElement.addEventListener('click', addLiketoProduct);
+                getTotalLikes();
+            });
+        }
+
+        btnLikeElement.addEventListener('click', addLiketoProduct);
+        checkLikeStatus();
+        getTotalLikes();
+
+
+        document.addEventListener('DOMContentLoaded', function () {
+            var quantityInput = document.getElementById('quantity-input');
+            var btnMinus = document.getElementById('btn-minus');
+            var btnPlus = document.getElementById('btn-plus');
+
+            function validateInput(input) {
+                var min = parseInt(input.getAttribute('min'));
+                var max = parseInt(input.getAttribute('max'));
+                var value = parseInt(input.value);
+
+                if (value < min) {
+                    input.value = min;
+                }
+
+                if (value > max) {
+                    input.value = max;
+                }
+            }
+
+            btnMinus.addEventListener('click', function () {
+                var currentValue = parseInt(quantityInput.value);
+                if (currentValue > parseInt(quantityInput.getAttribute('min'))) {
+                    quantityInput.value = currentValue - 1;
+                    validateInput(quantityInput);
+                }
+            });
+
+            btnPlus.addEventListener('click', function () {
+                var currentValue = parseInt(quantityInput.value);
+                if (currentValue < parseInt(quantityInput.getAttribute('max'))) {
+                    quantityInput.value = currentValue + 1;
+                    validateInput(quantityInput);
+                }
+            });
+
+            quantityInput.addEventListener('input', function () {
+                validateInput(quantityInput);
+            });
+        });
+
+        
+
+    </script>
+}
+
+<!-- Modal -->
+<div class="modal fade" id="imageModal" tabindex="-1" aria-labelledby="imageModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="imageModalLabel">Image Preview</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <img id="modalImage" src="" alt="Modal Image" class="img-fluid">
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Cart Animation Modal -->
+<div class="modal fade" id="cartAnimationModal" tabindex="-1" aria-labelledby="cartAnimationModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-body text-center">
+                <div class="cart-animation">
+                    <div class="cart-icon">
+                        <i class="bi bi-cart"></i>
+                    </div>
+                    <div class="tick-icon">
+                        <i class="bi bi-check-circle-fill"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
