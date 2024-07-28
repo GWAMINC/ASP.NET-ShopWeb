@@ -28,6 +28,7 @@ namespace ShopWeb.Controllers
         {
             return View();
         }
+        uabhnsdiasndaisbndhasbfijdfnvfisvfsvdhkfbkdfb
         [HttpPost]
         public async Task<IActionResult> Register(RegisterViewModel registerViewModel)
         {
