@@ -18,6 +18,10 @@
         <h4>Heading: @Model.Heading</h4>
         <h4>Content: @Model.Content</h4>
         <h4>Created At: @Model.CreatedAt</h4>
+        @if (@Model.State == "Done")
+        {
+            <h4>Admin Replied: @Model.ReplyContent</h4>
+        }
     </div>
 
     @if (signInManager.IsSignedIn(User) && User.IsInRole("Admin"))

@@ -1,0 +1,17 @@
+@model ShopWeb.Models.ViewModels.ResponseVM.ResponseViewModel
+
+<div id="response-container">
+    <h1>Reply to Response</h1>
+
+    <form asp-action="Reply" method="post">
+        <input type="hidden" asp-for="Id" />
+        <div class="form-group">
+            <label asp-for="ReplyContent"></label>
+            <textarea asp-for="ReplyContent" class="form-control"></textarea>
+            <span asp-validation-for="ReplyContent" class="text-danger"></span>
+        </div>
+        <button type="submit" class="btn btn-primary">Reply</button>
+    </form>
+
+    <a asp-action="Index">Back to List</a>
+</div>
