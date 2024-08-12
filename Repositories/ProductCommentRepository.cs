@@ -20,10 +20,26 @@ namespace ShopWeb.Repositories
             return productComment;
         }
 
-        public async Task<IEnumerable<ProductComment>> GetAllAsync(Guid productId)
+
+        public async Task<IEnumerable<ProductComment>> GetAllAsync(Guid productId, int? page, int? pageSize)
         {
-           return await shopWebDbContext.ProductComment.Where(x =>  x.ProductId == productId).ToListAsync();
+            var query = shopWebDbContext.ProductComment
+                .Where(x => x.ProductId == productId)
+                .OrderByDescending(x => x.TimeAdd);
+
+            if (page.HasValue && pageSize.HasValue)
+            {
+                return await query
+                    .Skip((page.Value - 1) * pageSize.Value)
+                    .Take(pageSize.Value)
+                    .ToListAsync();
+            }
+
+            return await query.ToListAsync();
         }
+
+
+
         public async Task<int> CountAllCommentsByIdAsync(Guid productId)
         {
             return await shopWebDbContext.ProductComment.Where(x => x.ProductId == productId).CountAsync();
