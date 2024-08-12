@@ -1,4 +1,4 @@
-﻿﻿using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore.Metadata.Internal;
 using ShopWeb.Models.Domain;
@@ -219,3 +219,4 @@ namespace ShopWeb.Controllers
         }
     }
 }
+
