@@ -1,4 +1,4 @@
-﻿using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore.Metadata.Internal;
 using ShopWeb.Models.Domain;
@@ -37,13 +37,15 @@ namespace ShopWeb.Controllers
             this.productRatingRepository = productRatingRepository;
         }
         [HttpGet]
-        public async Task<IActionResult> Index(Guid id)
+        public async Task<IActionResult> Index(Guid id, int page = 1)
         {
+            const int pageSize = 5; // Number of comments per page
             var liked = false;
             var product = await productRepository.GetAsync(id);
 
             double? averageRating = await productRatingRepository.GetAverageRating(id);
-            if (averageRating == null) {
+            if (averageRating == null)
+            {
                 averageRating = 0;
             }
 
@@ -64,14 +66,13 @@ namespace ShopWeb.Controllers
 
                 var productVariants = await productVariantRepository.GetVariantsByProductIdAsync(id);
 
-                List<Dictionary<string , HashSet<string>>> variants = new List<Dictionary<string, HashSet<string>>>();
+                List<Dictionary<string, HashSet<string>>> variants = new List<Dictionary<string, HashSet<string>>>();
 
                 if (productVariants is not null)
                 {
                     Dictionary<string, HashSet<string>> dictionary = new Dictionary<string, HashSet<string>>();
                     foreach (var productVariant in productVariants)
                     {
-
                         var mdls = await variantAttributesRepository.GetAllVariantsAttributeByVariantAsync(productVariant.Id);
                         if (mdls != null)
                         {
@@ -97,7 +98,12 @@ namespace ShopWeb.Controllers
                     variants.Add(dictionary);
                 }
 
-                var productInDomain = await productCommentRepository.GetAllAsync(product.Id);
+                
+                var totalCommentsCount = await productCommentRepository.CountAllCommentsByIdAsync(product.Id);
+                var pageCount = (int)Math.Ceiling((double)totalCommentsCount / pageSize);
+
+                
+                var productInDomain = await productCommentRepository.GetAllAsync(product.Id, page, pageSize);
 
                 var productCommentForView = new List<ProductCommentViewModel>();
                 foreach (var productComment in productInDomain)
@@ -111,7 +117,8 @@ namespace ShopWeb.Controllers
                             TimeAdd = productComment.TimeAdd,
                             Username = check.UserName
                         });
-                    } else
+                    }
+                    else
                     {
                         productCommentForView.Add(new ProductCommentViewModel
                         {
@@ -123,7 +130,6 @@ namespace ShopWeb.Controllers
                 }
 
                 var additionalImages = await productRepository.GetAdditionalImagesAsync(id);
-
                 var additionalImageUrls = additionalImages.Select(img => img.ImageUrl).ToList();
 
                 var model = new ProductDetailViewModel
@@ -144,18 +150,21 @@ namespace ShopWeb.Controllers
                     SalePrice = product.SalePrice,
                     SaleEndDate = product.SaleEndDate,
                 };
+
                 ViewData["Liked"] = liked;
                 ViewData["AverageRating"] = averageRating;
+                ViewData["Page"] = page;
+                ViewData["PageCount"] = pageCount;
                 return View(model);
-
             }
+
             ViewData["Liked"] = liked;
             ViewData["AverageRating"] = averageRating;
+            ViewData["Page"] = page;
+            ViewData["PageCount"] = 1;
             return View();
-
-            
-            
         }
+
 
         [HttpPost]
         public async Task<IActionResult> Index(ProductDetailViewModel productDetailViewModel)
@@ -210,3 +219,4 @@ namespace ShopWeb.Controllers
         }
     }
 }
+
