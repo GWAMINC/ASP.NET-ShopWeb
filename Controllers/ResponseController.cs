@@ -50,6 +50,8 @@ namespace ShopWeb.Controllers
                 Heading = response.Heading,
                 Content = response.Content,
                 CreatedAt = response.CreatedAt,
+                State = response.State,
+                ReplyContent = response.ReplyContent
             };
             return View(model);
         }
@@ -73,7 +75,8 @@ namespace ShopWeb.Controllers
                     Heading = responseViewModel.Heading,
                     Content = responseViewModel.Content,
                     CreatedAt = DateTime.Now,
-                    State = "Pending"
+                    State = "Pending",
+                    ReplyContent = ""
                 };
                 await _responseRepository.AddResponseAsync(response);
                 return RedirectToAction("customerIndex");
@@ -149,9 +152,20 @@ namespace ShopWeb.Controllers
             }
             return RedirectToAction(nameof(Index));
         }
-
+        
+        // GET: Response/Reply/{id}
+        [Authorize(Roles = "Admin")]
         [HttpGet]
-        public async Task<IActionResult> UpdateState(Guid id)
+        public async Task<IActionResult> Reply(Guid id)
+        {
+            return View();
+        }
+        
+        // POST: Response/Reply/{id}
+        [HttpPost]
+        [Authorize(Roles = "Admin")]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> Reply(Guid id, ResponseViewModel responseViewModel)
         {
             var response = await _responseRepository.GetResponseByIdAsync(id);
             if (response == null)
@@ -159,10 +173,8 @@ namespace ShopWeb.Controllers
                 return NotFound();
             }
 
-            if (response.State == "Pending")
-            {
-                response.State = "Done";
-            }
+            response.ReplyContent = responseViewModel.ReplyContent;
+            response.State = "Done";
 
             await _responseRepository.UpdateResponseAsync(response);
 

@@ -37,14 +37,14 @@
                     <td>@response.Content</td>
                     <td>@response.CreatedAt</td>
                     <td>@response.State</td>
-                    @if (response.State == "Pending")
-                    {
-                        <td>
-                            <a asp-action="Details" asp-route-id="@response.Id">Details</a> |
-                            <a asp-action="Edit" asp-route-id="@response.Id">Edit</a> |
+                    <td>
+                        <a asp-action="Details" asp-route-id="@response.Id">Details</a>
+                        @if (response.State == "Pending")   
+                        {
+                            <a asp-action="Edit" asp-route-id="@response.Id">Edit</a> 
                             <a asp-action="Delete" asp-route-id="@response.Id">Delete</a>
-                        </td>
-                    }
+                        }
+                    </td>
                 </tr>
             }
         </tbody>
