@@ -297,6 +297,33 @@
 @section Scripts {
     <script>
 
+        function getRandomColor() {
+            const colors = [
+                "red",
+                "orange",
+                "yellow",
+                "green",
+                "blue",
+                "indigo",
+                "violet",
+            ];
+            return colors[Math.floor(Math.random() * colors.length)];
+        }
+
+        document.addEventListener("mousemove", function (e) {
+            const trail = document.createElement("div");
+            trail.className = "trail";
+            trail.style.left = `${e.pageX - 5}px`;
+            trail.style.top = `${e.pageY - 5}px`;
+            trail.style.backgroundColor = getRandomColor(); // Set a random color initially
+            document.body.appendChild(trail);
+
+            // Remove the trail after 1 second (1000 ms)
+            setTimeout(() => {
+                trail.remove();
+            }, 1000);
+        });
+
         $(document).ready(function () {
             $('.category-tag').click(function () {
                 var categoryName = $(this).text().trim();
@@ -361,6 +388,7 @@
 
 
         
+    
     </script>
 
 }
