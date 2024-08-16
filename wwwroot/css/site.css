@@ -1300,11 +1300,59 @@ body {
     transition: all 0.3s ease;
 }
 
-    .variant-button.highlight {
-        background: #28a745;
-        color: white;
-    }
+.variant-button.highlight {
+    background: #28a745;
+    color: white;
+}
 
+
+/* trail cursor */
+.trail {
+    position: absolute;
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    pointer-events: none;
+    box-shadow: 0 0 10px rgba(255, 255, 255, 0.8),
+    0 0 20px rgba(255, 255, 255, 0.5), 0 0 30px rgba(255, 255, 255, 0.3);
+    animation: fadeout 1s forwards, changeColor 0.4s linear infinite;
+}
+
+/* Animation to fade out the trail */
+@keyframes fadeout {
+    0% {
+        opacity: 1;
+        transform: scale(1);
+    }
+    100% {
+        opacity: 0;
+        transform: scale(0.5);
+    }
+}
+
+/* Keyframes for changing colors randomly */
+@keyframes changeColor {
+    0% {
+        background-color: red;
+    }
+    20% {
+        background-color: orange;
+    }
+    40% {
+        background-color: yellow;
+    }
+    60% {
+        background-color: green;
+    }
+    80% {
+        background-color: blue;
+    }
+    100% {
+        background-color: violet;
+    }
+}
+    
+    
 
 
 
