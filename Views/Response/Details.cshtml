@@ -1,38 +1,34 @@
 ﻿@using Microsoft.AspNetCore.Identity;
 @using ShopWeb.Models.Domain;
-
 @inject SignInManager<ApplicationUser> signInManager;
-
 @model ShopWeb.Models.ViewModels.ResponseVM.ResponseViewModel;
 
 @{
-    
+ViewBag.RenderDefaultNavbar = false;
 }
+@await Html.PartialAsync("SideNavBar")
+
 <div id="response-container">
-
-    <h1>Response Details</h1>
-
+    <h1>Chi tiết phản hồi</h1>
     <div>
-        <h4>Id: @Model.Id</h4>
         <h4>Người gửi: @(Model?.UserName ?? "User not found")</h4>
-        <h4>Heading: @Model.Heading</h4>
-        <h4>Content: @Model.Content</h4>
-        <h4>Created At: @Model.CreatedAt</h4>
+        <h4>Tiêu đề: @Model.Heading</h4>
+        <h4>Nội dung: @Model.Content</h4>
+        <h4>Ngày tạo: @Model.CreatedAt</h4>
         @if (@Model.State == "Done")
         {
-            <h4>Admin Replied: @Model.ReplyContent</h4>
+            <h4>Phản hồi từ quản trị viên: @Model.ReplyContent</h4>
         }
     </div>
-
     @if (signInManager.IsSignedIn(User) && User.IsInRole("Admin"))
     {
         <p>
-            <a asp-area="" asp-controller="Response" asp-action="Index">Back to List</a>
+            <a asp-area="" asp-controller="Response" asp-action="Index">Quay lại danh sách</a>
         </p>
     } else
     {
         <p>
-            <a asp-area="" asp-controller="Response" asp-action="customerIndex">Back to List</a>
+            <a asp-area="" asp-controller="Response" asp-action="customerIndex">Quay lại danh sách</a>
         </p>
     }
 </div>
