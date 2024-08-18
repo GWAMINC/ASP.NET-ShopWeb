@@ -9,46 +9,44 @@
 
 @await Html.PartialAsync("SideNavBar")
 
-<div id="response-container" style="margin-left: 200px;">
-    <h1>Responses</h1>
-    <p>
-        <a asp-action="Create" class="btn btn-primary">Create New</a>
-    </p>
+<div id="response-container" >
+    <h1>Phản hồi</h1>
 
     <table class="table">
         <thead>
-            <tr>
-                <th>Id</th>
-                <th>User Id</th>
-                <th>Heading</th>
-                <th>Content</th>
-                <th>Created At</th>
-                <th>State</th>
-                <th></th>
-            </tr>
+        <tr>
+            <th>Người dùng</th>
+            <th>Tiêu đề</th>
+            <th>Nội dung</th>
+            <th>Ngày tạo</th>
+            <th>Trạng thái</th>
+            <th></th>
+        </tr>
         </thead>
         <tbody>
-            @foreach (var response in Model)
-            {
-                <tr>
-                    <td>@response.Id</td>
-                    <td>@(await userManager.FindByIdAsync(response.UserId.ToString()))</td>
-                    <td>@response.Heading</td>
-                    <td>@response.Content</td>
-                    <td>@response.CreatedAt</td>
-                    <td>@response.State</td>
-                    <td>
-                        <a asp-action="Details" asp-route-id="@response.Id">Details</a>
-                        @if (response.State == "Pending")   
-                        {
-                            <a asp-action="Edit" asp-route-id="@response.Id">Edit</a> 
-                            <a asp-action="Delete" asp-route-id="@response.Id">Delete</a>
-                        }
-                    </td>
-                </tr>
-            }
+        @foreach (var response in Model)
+        {
+            <tr>
+                <td>@(await userManager.FindByIdAsync(response.UserId.ToString()))</td>
+                <td>@response.Heading</td>
+                <td>@response.Content</td>
+                <td>@response.CreatedAt</td>
+                <td>@response.State</td>
+                <td>
+                    <a asp-action="Details" asp-route-id="@response.Id">Details</a>
+                    @if (response.State == "Pending")   
+                    {
+                        <a asp-action="Edit" asp-route-id="@response.Id">Edit</a> 
+                        <a asp-action="Delete" asp-route-id="@response.Id">Delete</a>
+                    }
+                </td>
+            </tr>
+        }
         </tbody>
     </table>
+    <p>
+        <a asp-action="Create" class="btn btn-primary">Tạo mới</a>
+    </p>
 </div>
 
 
