@@ -54,7 +54,7 @@ namespace ShopWeb.Repositories
 
         public async Task<Product?> GetAsync(Guid id)
         {
-            return await shopWebDbContext.Products.Include(x => x.ProductImages).Include(x => x.Categories).FirstOrDefaultAsync(x => x.Id == id);    
+            return await shopWebDbContext.Products.Include(x => x.ProductImages).Include(x => x.Categories).FirstOrDefaultAsync(x => x.Id == id);
         }
 
         public async Task<Product?> UpdateAsync(Product product)
@@ -76,10 +76,10 @@ namespace ShopWeb.Repositories
             return null;
         }
 
-        public async Task<Product?> UpdateRatingAsync (Guid id)
+        public async Task<Product?> UpdateRatingAsync(Guid id)
         {
             double? averageR = await productRatingRepository.GetAverageRating(id);
-            if (averageR == null) 
+            if (averageR == null)
             {
                 averageR = 0;
             }
@@ -96,7 +96,7 @@ namespace ShopWeb.Repositories
             return null;
 
         }
-        public async Task<Product?> UpdateCommentCountAsync (Guid id, int totalComments)
+        public async Task<Product?> UpdateCommentCountAsync(Guid id, int totalComments)
         {
             var existingProd = await shopWebDbContext.Products.Include(x => x.Categories).FirstOrDefaultAsync(x => x.Id == id);
             if (existingProd != null)
