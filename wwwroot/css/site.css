@@ -1351,8 +1351,62 @@ body {
         background-color: violet;
     }
 }
-    
-    
+
+#response-container {
+    max-width: 800px;
+    margin: 50px auto;
+    padding: 20px;
+    border: 2px solid #28a745;
+    border-radius: 10px;
+    box-shadow: 0 0 10px rgba(0, 123, 255, 0.3);
+    background-color: #f8f9fa;
+}
+
+#response-container h1 {
+    font-size: 2em;
+    font-weight: bold;
+    color: #343a40;
+    margin-bottom: 20px;
+}
+
+#response-container h4 {
+    font-size: 1.2em;
+    color: #343a40;
+    margin-bottom: 10px;
+}
+
+#response-container div {
+    margin-bottom: 20px;
+}
+
+#response-container a {
+    color: #28a745;
+    text-decoration: none;
+    font-weight: bold;
+}
+
+#response-container a:hover {
+    color: white;
+    text-decoration: underline;
+}
+
+#response-container p a {
+    display: inline-block;
+    padding: 10px 20px;
+    margin-top: 20px;
+    font-size: 1em;
+    font-weight: bold;
+    color: #fff;
+    background-color: #28a745;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+#response-container p a:hover {
+    background-color: #1e7e34;
+}
 
 
 

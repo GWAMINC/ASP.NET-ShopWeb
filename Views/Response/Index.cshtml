@@ -2,17 +2,16 @@
 
 <div id="response-container">
 
-    <h1>Responses</h1>
+    <h1>Phản hồi</h1>
 
     <table class="table">
         <thead>
             <tr>
-                <th>Id</th>
-                <th>User Id</th>
-                <th>Heading</th>
-                <th>Content</th>
-                <th>Created At</th>
-                <th>State</th>
+                <th>Người dùng</th>
+                <th>Tiêu đề</th>
+                <th>Nội dung</th>
+                <th>Ngày tạo</th>
+                <th>Trạng thái</th>
                 <th></th>
                 <th></th>
             </tr>
@@ -21,7 +20,6 @@
             @foreach (var response in Model)
             {
                 <tr>
-                    <td>@response.Id</td>
                     <td>@response.UserId</td>
                     <td>@response.Heading</td>
                     <td>@response.Content</td>
